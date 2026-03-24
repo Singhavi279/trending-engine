@@ -8,13 +8,15 @@
 import { NextResponse } from 'next/server';
 import { deduplicateTrends, type RawTrend } from '@/lib/dedup';
 import { rankTrends, type Article } from '@/lib/scoring';
-import { getInternalAppBaseUrl } from '@/lib/internal-base-url';
-import { fetchJson } from '@/lib/fetch-json-internal';
 import {
   appendTrendSnapshot,
   loadTrendHistory,
   type TrendHistorySnapshot,
 } from '@/lib/trend-history-store';
+
+import { GET as getSitemap } from '@/app/api/sitemap/route';
+import { GET as getGoogle } from '@/app/api/trends/google/route';
+import { GET as getTwitter } from '@/app/api/trends/twitter/route';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,17 +27,32 @@ type TrendsPayload = {
 
 export async function GET(request: Request) {
   try {
-    const base = getInternalAppBaseUrl(request);
     const topN = parseInt(process.env.TOP_N || '10', 10);
     const maxArticlesOut = parseInt(
       process.env.MERGE_MAX_ARTICLES || '2000',
       10
     );
 
+    // Helper to safely call local route handlers directly
+    async function callLocal<T>(
+      route: () => Promise<Response>
+    ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
+      try {
+        const res = await route();
+        const data = await res.json();
+        if (!res.ok) {
+          return { ok: false, error: data.error || `HTTP ${res.status}` };
+        }
+        return { ok: true, data: data as T };
+      } catch (e) {
+        return { ok: false, error: String(e) };
+      }
+    }
+
     const [sitemapResult, googleResult, twitterResult] = await Promise.all([
-      fetchJson<SitemapPayload>(`${base}/api/sitemap`),
-      fetchJson<TrendsPayload>(`${base}/api/trends/google`),
-      fetchJson<TrendsPayload>(`${base}/api/trends/twitter`),
+      callLocal<SitemapPayload>(getSitemap),
+      callLocal<TrendsPayload>(getGoogle),
+      callLocal<TrendsPayload>(getTwitter),
     ]);
 
     let sitemapError: string | null = null;
