@@ -1,0 +1,342 @@
+@import "tailwindcss";
+
+/* ─── Custom Properties ──────────────────────────────────────────── */
+:root {
+  --accent-hue: 220;
+  --accent-primary: hsl(var(--accent-hue), 90%, 56%);
+  --accent-glow: hsl(var(--accent-hue), 100%, 65%);
+  --accent-dim: hsl(var(--accent-hue), 60%, 20%);
+
+  --surface-0: #09090b;
+  --surface-1: #111114;
+  --surface-2: #18181b;
+  --surface-3: #1e1e22;
+  --surface-4: #27272a;
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --green: #22c55e;
+  --green-dim: rgba(34, 197, 94, 0.12);
+  --red: #ef4444;
+  --red-dim: rgba(239, 68, 68, 0.12);
+  --amber: #f59e0b;
+  --amber-dim: rgba(245, 158, 11, 0.12);
+  --blue: #3b82f6;
+  --blue-dim: rgba(59, 130, 246, 0.12);
+  --purple: #a855f7;
+  --purple-dim: rgba(168, 85, 247, 0.12);
+}
+
+/* ─── Base Reset ──────────────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Glassmorphism ──────────────────────────────────────────────── */
+.glass {
+  background: rgba(17, 17, 20, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+}
+
+.glass-subtle {
+  background: rgba(24, 24, 27, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Animations ──────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes countdownPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-slide-out {
+  animation: slideOutRight 0.25s ease-in both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin 2s linear infinite;
+}
+
+.animate-countdown {
+  animation: countdownPulse 2s ease-in-out infinite;
+}
+
+/* ─── Staggered row animations ──────────────────────────────────── */
+.stagger-row:nth-child(1) { animation-delay: 0.05s; }
+.stagger-row:nth-child(2) { animation-delay: 0.1s; }
+.stagger-row:nth-child(3) { animation-delay: 0.15s; }
+.stagger-row:nth-child(4) { animation-delay: 0.2s; }
+.stagger-row:nth-child(5) { animation-delay: 0.25s; }
+.stagger-row:nth-child(6) { animation-delay: 0.3s; }
+.stagger-row:nth-child(7) { animation-delay: 0.35s; }
+.stagger-row:nth-child(8) { animation-delay: 0.4s; }
+.stagger-row:nth-child(9) { animation-delay: 0.45s; }
+.stagger-row:nth-child(10) { animation-delay: 0.5s; }
+
+/* ─── Gradient Backgrounds ───────────────────────────────────────── */
+.gradient-mesh {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 55% at 15% -5%, rgba(59, 130, 246, 0.11), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 85% 105%, rgba(168, 85, 247, 0.09), transparent 50%),
+    radial-gradient(ellipse 45% 35% at 50% 40%, rgba(34, 197, 94, 0.04), transparent 60%),
+    linear-gradient(180deg, #080809 0%, #09090b 40%, #0a0a0c 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gradient-mesh::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 15%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Premium surface cards */
+.card-premium {
+  background: linear-gradient(
+    145deg,
+    rgba(24, 24, 28, 0.72) 0%,
+    rgba(17, 17, 20, 0.85) 100%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35) inset,
+    0 24px 48px -24px rgba(0, 0, 0, 0.55);
+}
+
+.panel-surface {
+  background: linear-gradient(180deg, #0c0c10 0%, #09090c 100%);
+  box-shadow: -12px 0 40px rgba(0, 0, 0, 0.45);
+}
+
+.panel-accent {
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #a855f7);
+  opacity: 0.9;
+}
+
+/* ─── Glow Effects ───────────────────────────────────────────────── */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15), 0 0 60px rgba(59, 130, 246, 0.05);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.15), 0 0 60px rgba(34, 197, 94, 0.05);
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15), 0 0 60px rgba(168, 85, 247, 0.05);
+}
+
+.glow-amber {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.05);
+}
+
+/* ─── Transitions ────────────────────────────────────────────────── */
+.transition-all-smooth {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Table Hover ────────────────────────────────────────────────── */
+.trend-row {
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.trend-row:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(59, 130, 246, 0.06) 0%,
+    rgba(59, 130, 246, 0.02) 100%
+  );
+  box-shadow: inset 3px 0 0 0 rgba(59, 130, 246, 0.45);
+}
+
+.trend-table-wrap {
+  max-height: min(70vh, 720px);
+}
+
+.trend-table-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 12, 14, 0.97) 0%,
+    rgba(10, 10, 12, 0.92) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Badge Styles ───────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-google {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.badge-twitter {
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.badge-covered {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.badge-uncovered {
+  background: var(--red-dim);
+  color: var(--red);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ─── Progress Ring ──────────────────────────────────────────────── */
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring circle {
+  transition: stroke-dashoffset 1s linear;
+}
