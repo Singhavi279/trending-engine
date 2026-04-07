@@ -226,7 +226,9 @@ export function findCommonMapping(text: string): string | null {
 }
 
 /**
- * Normalize text for comparison: transliterate Hindi, lowercase, strip noise
+ * Normalize text for comparison: transliterate Hindi, lowercase, strip noise.
+ * After transliteration, collapses long-vowel romanizations (aa→a, ee→i, oo→u)
+ * so that "सलमान" → "salamaana" → "salamana" better matches "salman".
  */
 export function normalizeForComparison(text: string): string {
   let normalized = text.trim().toLowerCase();
@@ -241,6 +243,14 @@ export function normalizeForComparison(text: string): string {
   if (containsHindi(normalized)) {
     normalized = transliterate(normalized).toLowerCase();
   }
+
+  // Shorten doubled vowels from transliteration (common romanization mismatch)
+  // "aa" → "a", "ee" → "i", "oo" → "u" — brings transliteration closer to
+  // conventional English spellings (e.g. "salamaana" → "salamana", "khaan" → "khan")
+  normalized = normalized
+    .replace(/aa/g, 'a')
+    .replace(/ee/g, 'i')
+    .replace(/oo/g, 'u');
 
   // Collapse whitespace
   normalized = normalized.replace(/\s+/g, ' ').trim();

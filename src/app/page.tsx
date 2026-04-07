@@ -117,9 +117,9 @@ export default function Dashboard() {
         allArticles.length > 0
           ? allArticles
           : (data?.articles ?? []);
-      const batch = pool.slice(0, 50);
 
-      if (batch.length === 0) {
+      // If no article pool available, use pre-matched articles from merge
+      if (pool.length === 0) {
         setFilteredArticles(matchedToFiltered(trend.matchedArticles));
         setFilterLoading(false);
         return;
@@ -131,15 +131,22 @@ export default function Dashboard() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             trend: trend.keyword,
-            articles: batch,
+            articles: pool,
           }),
         });
 
         if (!res.ok) throw new Error(`Filter API returned ${res.status}`);
         const json = await res.json();
         const list: FilteredArticle[] = json.articles || [];
-        setFilteredArticles(list);
+
+        if (list.length > 0) {
+          setFilteredArticles(list);
+        } else {
+          // Fall back to pre-matched articles from the merge API
+          setFilteredArticles(matchedToFiltered(trend.matchedArticles));
+        }
       } catch {
+        // On any error, fall back to pre-matched articles
         setFilteredArticles(matchedToFiltered(trend.matchedArticles));
       } finally {
         setFilterLoading(false);

@@ -11,9 +11,9 @@ import {
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-const MAX_BODY_BYTES = 256 * 1024;
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
 const MAX_TREND_LEN = 400;
-const MAX_ARTICLES_IN_REQUEST = 100;
+const MAX_ARTICLES_IN_REQUEST = 2000;
 const MAX_TITLE_CHARS = 500;
 const MAX_URL_CHARS = 2048;
 const MAX_KEYWORD_LEN = 200;
