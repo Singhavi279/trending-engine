@@ -1,32 +1,33 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-/* ─── Base Reset ──────────────────────────────────────────────────── */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* ─── Base Styles ─────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light !important;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  overflow-x: hidden;
-  background-color: #09090b; /* zinc-950 */
-  color: #f4f4f5; /* zinc-100 */
+  body {
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: #f8f9fa !important;
+    color: #202124 !important;
+  }
 }
 
 /* ─── Variables ──────────────────────────────────────────────────── */
 :root {
-  --background: #09090b; /* zinc-950 */
-  --foreground: #f4f4f5; /* zinc-100 */
+  --google-blue: #4285f4;
+  --google-red: #ea4335;
+  --google-yellow: #fbbc04;
+  --google-green: #34a853;
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────── */
@@ -40,74 +41,82 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46; /* zinc-700 */
+  background: #dadce0; 
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b; /* zinc-600 */
+  background: #bdc1c6;
 }
 
 /* ─── Utilities & Components ─────────────────────────────────────── */
 
-.card-premium {
-  @apply bg-zinc-900/40 border border-white/[0.08] rounded-2xl backdrop-blur-md shadow-xl shadow-black/20;
+/* Light Glassmorphic aesthetics */
+.card-glass {
+  @apply bg-white/70 border border-white/50 rounded-2xl backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 ease-out hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)];
 }
 
 .badge {
-  @apply inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider;
+  @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm border;
 }
 
 .badge-google {
-  @apply border border-blue-500/30 bg-blue-500/10 text-blue-300;
+  @apply border-[#4285f4]/30 bg-[#4285f4]/10 text-[#1a73e8];
 }
 
 .badge-twitter {
-  @apply border border-purple-500/30 bg-purple-500/10 text-purple-300;
+  @apply border-slate-300/50 bg-slate-100/50 text-slate-700;
 }
 
 .badge-covered {
-  @apply border border-emerald-500/30 bg-emerald-500/10 text-emerald-300;
+  @apply border-[#34a853]/30 bg-[#34a853]/10 text-[#188038];
 }
 
 .badge-uncovered {
-  @apply border border-zinc-500/30 bg-zinc-500/10 text-zinc-400;
+  @apply border-slate-200 bg-white/50 text-slate-500;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white bg-[#4285f4] hover:bg-[#1a73e8] hover:shadow-lg hover:shadow-[#4285f4]/30 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#4285f4]/20 active:scale-95;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-600 bg-white/80 border border-slate-200/60 backdrop-blur-md hover:bg-slate-50 hover:text-slate-800 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-slate-100 active:scale-95 shadow-sm;
 }
 
 .transition-all-smooth {
-  @apply transition-all duration-300 ease-in-out;
+  @apply transition-all duration-300 ease-out;
 }
 
 .gradient-mesh {
-  @apply absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-zinc-950 to-zinc-950 opacity-60;
+  @apply absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_rgba(66,133,244,0.06),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(52,168,83,0.04),_transparent_40%)] pointer-events-none;
 }
 
 .trend-table-head th {
-  @apply bg-zinc-950/80 backdrop-blur-md border-y border-white/[0.06] sticky top-0 z-10;
+  @apply bg-white/80 backdrop-blur-xl border-y border-slate-100 sticky top-0 z-10 text-slate-500;
 }
 
-.trend-row:hover {
-  @apply bg-white/[0.02] border-white/[0.08];
+.trend-row {
+  @apply bg-transparent transition-colors duration-200 border-b border-slate-100/50 hover:bg-blue-50/50;
 }
 
 .panel-surface {
-  @apply bg-[#0a0a0d] shadow-2xl shadow-black;
+  @apply bg-white/95 backdrop-blur-2xl shadow-[-20px_0_40px_rgba(0,0,0,0.04)] border-l border-white/80;
 }
 
 .panel-accent {
-  @apply absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 via-blue-500 to-violet-500;
+  @apply absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#4285f4] via-[#ea4335] to-[#fbbc04];
 }
 
 .glass-subtle {
-  @apply bg-zinc-900/30 backdrop-blur-sm;
+  @apply bg-white/60 backdrop-blur-md;
 }
-
 
 /* ─── Animations ──────────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -142,19 +151,19 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out both;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out both;
+  animation: fadeIn 0.4s ease-out both;
 }
 
 .animate-slide-in {
-  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+  background: linear-gradient(90deg, rgba(230,232,235,0.4) 25%, rgba(230,232,235,0.8) 50%, rgba(230,232,235,0.4) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -167,11 +176,11 @@ body {
     display: none;
 }
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
-/* ─── Table Hover ────────────────────────────────────────────────── */
+/* ─── Table ──────────────────────────────────────────────────────── */
 .trend-table-wrap {
   max-height: min(70vh, 720px);
 }
