@@ -3,13 +3,17 @@
  *
  * Orchestrates: fetch all sources → deduplicate → score → rank → respond
  * This is the single endpoint the dashboard calls.
+ *
+ * Calls source fetchers directly (no internal HTTP) to avoid
+ * Vercel Deployment Protection 401 issues.
  */
 
 import { NextResponse } from 'next/server';
 import { deduplicateTrends, type RawTrend } from '@/lib/dedup';
 import { rankTrends, type Article } from '@/lib/scoring';
-import { getInternalAppBaseUrl } from '@/lib/internal-base-url';
-import { fetchJson } from '@/lib/fetch-json-internal';
+import { fetchGoogleTrends } from '@/lib/fetch-google-trends';
+import { fetchTwitterTrends } from '@/lib/fetch-twitter-trends';
+import { fetchSitemap } from '@/lib/fetch-sitemap';
 import {
   appendTrendSnapshot,
   loadTrendHistory,
@@ -18,72 +22,51 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-type SitemapPayload = { articles?: Article[] };
-type TrendsPayload = {
-  trends?: { keyword: string; fetchedAt: string }[];
-};
-
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const base = getInternalAppBaseUrl(request);
     const topN = parseInt(process.env.TOP_N || '10', 10);
     const maxArticlesOut = parseInt(
       process.env.MERGE_MAX_ARTICLES || '2000',
       10
     );
 
-    const [sitemapResult, googleResult, twitterResult] = await Promise.all([
-      fetchJson<SitemapPayload>(`${base}/api/sitemap`),
-      fetchJson<TrendsPayload>(`${base}/api/trends/google`),
-      fetchJson<TrendsPayload>(`${base}/api/trends/twitter`),
+    // Fetch all sources directly (no self HTTP calls)
+    const [sitemapResult, googleResult, twitterResult] = await Promise.allSettled([
+      fetchSitemap(),
+      fetchGoogleTrends(),
+      fetchTwitterTrends(),
     ]);
 
     let sitemapError: string | null = null;
     let articles: Article[] = [];
-    if (sitemapResult.ok) {
-      if (Array.isArray(sitemapResult.data.articles)) {
-        articles = sitemapResult.data.articles;
-      } else {
-        sitemapError = 'Sitemap response missing articles array';
-      }
+    if (sitemapResult.status === 'fulfilled') {
+      articles = sitemapResult.value.articles as Article[];
     } else {
-      sitemapError = sitemapResult.error;
+      sitemapError = sitemapResult.reason?.message || String(sitemapResult.reason);
     }
 
     let googleError: string | null = null;
     let googleTrends: RawTrend[] = [];
-    if (googleResult.ok) {
-      if (Array.isArray(googleResult.data.trends)) {
-        googleTrends = googleResult.data.trends.map(
-          (t: { keyword: string; fetchedAt: string }) => ({
-            keyword: t.keyword,
-            source: 'google' as const,
-            fetchedAt: t.fetchedAt,
-          })
-        );
-      } else {
-        googleError = 'Google response missing trends array';
-      }
+    if (googleResult.status === 'fulfilled') {
+      googleTrends = googleResult.value.trends.map((t) => ({
+        keyword: t.keyword,
+        source: 'google' as const,
+        fetchedAt: t.fetchedAt,
+      }));
     } else {
-      googleError = googleResult.error;
+      googleError = googleResult.reason?.message || String(googleResult.reason);
     }
 
     let twitterError: string | null = null;
     let twitterTrends: RawTrend[] = [];
-    if (twitterResult.ok) {
-      if (Array.isArray(twitterResult.data.trends)) {
-        twitterTrends = twitterResult.data.trends.map(
-          (t: { keyword: string; fetchedAt: string }) => ({
-            keyword: t.keyword,
-            source: 'twitter' as const,
-            fetchedAt: t.fetchedAt,
-          })
-        );
-      } else {
-        twitterError = 'Twitter response missing trends array';
-      }
+    if (twitterResult.status === 'fulfilled') {
+      twitterTrends = twitterResult.value.trends.map((t) => ({
+        keyword: t.keyword,
+        source: 'twitter' as const,
+        fetchedAt: t.fetchedAt,
+      }));
     } else {
-      twitterError = twitterResult.error;
+      twitterError = twitterResult.reason?.message || String(twitterResult.reason);
     }
 
     const allTrends: RawTrend[] = [...googleTrends, ...twitterTrends];
